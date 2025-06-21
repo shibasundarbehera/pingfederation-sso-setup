@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Site A - SPA Navigation Menu</title>
+    <style>
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+        }
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            cursor: pointer;
+        }
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        .dropbtn {
+            background-color: #4caf50;
+            color: white;
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to Site A (SPA)</h1>
+    <div class="dropdown">
+        <button class="dropbtn">Navigate to Other Sites</button>
+        <div class="dropdown-content">
+            <a onclick="redirectToSiteB()">Go to Site B</a>
+            <a href="#">Other Site (Placeholder)</a>
+        </div>
+    </div>
+    <p>This is a simple single-page application (SPA) with a navigation menu.</p>
+    <p>Click the button above to navigate to Site B.</p>
+    <p>Ensure that the redirect function is defined in app.js.</p>
+    <p>If you see an error, it means the app.js file is not loaded correctly.</p>
+    <p>Check the console for any errors related to loading app.js.</p>
+    <p>For testing purposes, you can also check the console log to see if the index.html is loaded.</p>
+    <p>Make sure to run this file in a local server environment to avoid CORS issues.</p>
+
+    <!-- Ensure app.js is loaded correctly -->
+    <script src="app.js"></script>
+    <!-- Add test script to verify loading -->
+    <script>
+        console.log('index.html loaded');
+        window.redirectToSiteB = window.redirectToSiteB || function() {
+            console.error('redirectToSiteB not defined. Ensure app.js is loaded.');
+            alert('Error: Redirect function not found.');
+        };
+    </script>
+</body>
+</html>
