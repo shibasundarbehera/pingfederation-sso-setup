@@ -1,68 +1,41 @@
-console.log('app.js loaded'); // Debug: Confirm script loading
+console.log('app.js loaded'); // Confirm JS is loaded
 
-const oidcConfig = {
-    idpAuthorizeUrl: 'https://idp.pingidentity.com/authorize', // Replace with actual PingIdentity endpoint
-    siteBClientId: 'site-b-client-id', // Replace with Site B's client ID
-    redirectUri: 'https://siteb.com/callback', // Replace with Site B's redirect URI
-    landingPage: 'https://siteb.com/landing', // Replace with desired landing page
-    scope: 'openid profile'
-};
+// === Configuration ===
+const siteBSSOGateway = 'https://app.ssb.co.uk/securelogin/samlgateway.aspx?id=12df34e-1234-1234-1234-234df56789'; // Site B SSO gateway URL
+const siteALoginURL = '/login'; // SPA login or IdP-initiated login path
 
-function getCookie(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    return parts.length === 2 ? parts.pop().split(';').shift() : null;
-}
-
-
+// === Token-based auth check (if Site A stores SSO session this way) ===
 function isAuthenticated() {
-    console.log('Checking authentication status'); // Debug
-    const idToken = localStorage.getItem('id_token');
+    console.log('[Auth] Checking if user is authenticated on Site A');
+
+    const idToken = localStorage.getItem('id_token'); // adjust if you're using cookies/sessionStorage
     if (!idToken) {
-        console.log('No ID token found in localStorage');
+        console.warn('[Auth] ID token not found');
         return false;
     }
 
     try {
-        // Decode JWT payload (base64url decoding)
         const payload = JSON.parse(atob(idToken.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
-        const expiry = payload.exp * 1000; // Convert to milliseconds
-        const isValid = Date.now() < expiry;
-        console.log('ID token valid:', isValid, 'Expiry:', new Date(expiry));
-        return isValid;
+        const expiry = payload.exp * 1000;
+        const valid = Date.now() < expiry;
+        console.log('[Auth] Token valid:', valid, '| Expires:', new Date(expiry));
+        return valid;
     } catch (e) {
-        console.error('Error parsing ID token:', e);
+        console.error('[Auth] Invalid token:', e);
         return false;
     }
 }
 
-function redirectToSiteALogin() {
-    console.log('Redirecting to Site A login');
-    window.location.href = '/login'; // Adjust to your SPA's login route
-}
-
+// === Redirect Logic to Site B ===
 function redirectToSiteB() {
-    console.log('Initiating redirect to Site B'); // Debug
-    if (!isAuthenticated()) {
-        console.warn('User not authenticated, redirecting to login');
-        redirectToSiteALogin();
-        return;
-    }
+    console.log('[Redirect] Redirect to Site B requested');
 
-    try {
-        const params = new URLSearchParams({
-            client_id: oidcConfig.siteBClientId,
-            response_type: 'code',
-            scope: oidcConfig.scope,
-            redirect_uri: oidcConfig.redirectUri,
-            state: encodeURIComponent(oidcConfig.landingPage)
-        });
+    // if (!isAuthenticated()) {
+    //     console.warn('[Redirect] User not authenticated. Redirecting to Site A login.');
+    //     window.location.href = siteALoginURL;
+    //     return;
+    // }
 
-        const redirectUrl = `${oidcConfig.idpAuthorizeUrl}?${params.toString()}`;
-        console.log('Redirect URL:', redirectUrl); // Debug: Log URL
-        window.location.href = redirectUrl;
-    } catch (error) {
-        console.error('Failed to initiate OIDC redirect:', error);
-        alert('Error redirecting to Site B. Please try again.');
-    }
+    console.log('[Redirect] User authenticated. Redirecting to Site B SSO gateway...');
+    window.location.href = siteBSSOGateway;
 }
